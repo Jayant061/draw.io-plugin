@@ -6,7 +6,8 @@ import { createArrow } from "./Models/CreateArrow";
 import { createInverter } from "./Schema/Inverter";
 import { createTransformer } from "./Schema/Transformer";
 import { createTriangle } from "./Models/CreateTriangle";
-
+import { createCircle } from "./Models/CreateCircle";
+import { createMxCellXML } from "./Schema/CreateHooks";
 
 const Draw = () => {
   const [xmlData, setXmlData] = useState<string | undefined>(undefined);
@@ -22,6 +23,11 @@ const Draw = () => {
     price: "39.95",
     name: "Sakshi",
   };
+  const ids = {
+    "123":"transformer",
+    "124":"circle",
+    "125":"triangle"
+  }
 
   const jsonToXml = (jsonObj:any) => {
     const drawioXml: XMLElement = xmlbuilder.create("mxfile", {
@@ -58,15 +64,20 @@ const Draw = () => {
     const root = graphModel.ele("root");
     root.ele("mxCell", { id: "0" });
     root.ele("mxCell", { id: "1", parent: "0" });
-    
 
-    createArrow(root,"arrow-1","1", "","Inverter1Panel2","Transformer1Triangle1");
-    createInverter(root,"1","LT Panel-1",200,200)
-    createInverter(root,"2","LT Panel-2",140, 200)
-    createTransformer(root,"1",200,500)
-    createTriangle(root,"1","1","",20,20,30,30,false)
+    createMxCellXML(root,"1",100,50,10,10)
     
-
+    Object.entries(jsonObj).forEach(([key,value])=>{
+      if(key==="124"){
+        createTransformer(root,key,200,200)
+      }
+      else if(key ==="123"){
+        createCircle(root,key,"1","",50,20,50);
+      }
+      else{
+        createTriangle(root,key,"1","",70,70,30,30,false);
+      }
+    })
     return drawioXml.end({ pretty: true });
   };
 
@@ -80,7 +91,7 @@ const Draw = () => {
   };
 
   useEffect(() => {
-    const x = handleConvertAndDownload(jsonContent);
+    const x = handleConvertAndDownload(ids);
     setXmlData(x);
   }, []);
 
